@@ -11,4 +11,11 @@ pub fn build(b: *std.Build) void {
     kernel.setLinkerScript(b.path("src/linker.ld"));
 
     b.installArtifact(kernel);
+
+    const run_cmd = b.addSystemCommand(&.{"qemu-system-i386"});
+    run_cmd.addArg("-kernel");
+    run_cmd.addArtifactArg(kernel);
+
+    const run_step = b.step("run", "Boot the kernel in QEMU");
+    run_step.dependOn(&run_cmd.step);
 }
