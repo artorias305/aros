@@ -8,5 +8,6 @@ void serial_init(void);
 void serial_write_byte(uint8_t byte);
 void serial_write_all(const uint8_t *bytes, size_t len);
 void serial_print(const char *str);
+void serial_write_hex(uint32_t value);
 
 #endif
