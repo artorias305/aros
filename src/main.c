@@ -2,6 +2,7 @@
 
 #include "gdt.h"
 #include "idt.h"
+#include "keyboard.h"
 #include "serial.h"
 #include "vga.h"
 
@@ -42,8 +43,10 @@ void kernel_main(void) {
 	idt_init();
 	serial_print("[OK]  IDT loaded\n");
 
+	keyboard_init();
+	serial_print("[OK]  keyboard initialized\n");
+
 	__asm__ volatile("sti");
-	__asm__ volatile("xorl %eax, %eax\n\tdivl %eax");
 
 	for (;;) {
 		__asm__ volatile("hlt");
