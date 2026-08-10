@@ -2,7 +2,9 @@
 
 #include "gdt.h"
 #include "idt.h"
+#include "keyboard.h"
 #include "serial.h"
+#include "shell.h"
 #include "vga.h"
 
 #define MB_ALIGN (1u << 0)
@@ -42,10 +44,10 @@ void kernel_main(void) {
 	idt_init();
 	serial_print("[OK]  IDT loaded\n");
 
-	__asm__ volatile("sti");
-	__asm__ volatile("xorl %eax, %eax\n\tdivl %eax");
+	keyboard_init();
+	serial_print("[OK]  keyboard initialized\n");
 
-	for (;;) {
-		__asm__ volatile("hlt");
-	}
+	__asm__ volatile("sti");
+
+	shell_run();
 }
