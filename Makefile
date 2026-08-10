@@ -6,7 +6,7 @@ CFLAGS  := --target=$(TARGET) -std=c11 -ffreestanding -fno-builtin \
            -O2 -g -Wall -Wextra
 LDFLAGS := -m elf_i386 -T src/linker.ld -nostdlib
 
-OBJS := build/main.o build/serial.o build/vga.o
+OBJS := build/main.o build/serial.o build/vga.o build/gdt.o
 
 all: build/kernel.elf
 

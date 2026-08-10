@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#include "gdt.h"
 #include "serial.h"
 #include "vga.h"
 
@@ -29,13 +30,15 @@ __attribute__((naked, noreturn)) void _start(void) {
 }
 
 void kernel_main(void) {
-	const char *msg = "Hello from C i386 Kernel!";
-
 	serial_init();
+	serial_print("[BOOT] serial initialized\n");
 
 	vga_init();
 
-	vga_write_str(msg);
+	gdt_init();
+	serial_print("[OK]  GDT loaded\n");
+
+	vga_write_str("aros: hello\n");
 
 	for (;;) {
 		__asm__ volatile("hlt");
