@@ -5,6 +5,7 @@
 #include "keyboard.h"
 #include "serial.h"
 #include "shell.h"
+#include "timer.h"
 #include "vga.h"
 
 #define MB_ALIGN (1u << 0)
@@ -46,6 +47,9 @@ void kernel_main(void) {
 
 	keyboard_init();
 	serial_print("[OK]  keyboard initialized\n");
+
+	timer_init(100);
+	serial_print("[OK]  PIT timer @ 100 Hz\n");
 
 	__asm__ volatile("sti");
 
