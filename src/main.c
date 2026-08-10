@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "gdt.h"
+#include "idt.h"
 #include "serial.h"
 #include "vga.h"
 
@@ -38,7 +39,11 @@ void kernel_main(void) {
 	gdt_init();
 	serial_print("[OK]  GDT loaded\n");
 
-	vga_write_str("aros: hello\n");
+	idt_init();
+	serial_print("[OK]  IDT loaded\n");
+
+	__asm__ volatile("sti");
+	__asm__ volatile("xorl %eax, %eax\n\tdivl %eax");
 
 	for (;;) {
 		__asm__ volatile("hlt");
