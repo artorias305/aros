@@ -4,6 +4,7 @@
 #include "io.h"
 #include "keyboard.h"
 #include "serial.h"
+#include "timer.h"
 
 #define KERNEL_CS 0x08u
 #define IDT_INT32 0x8Eu
@@ -150,6 +151,10 @@ void isr_handler(struct regs *r) {
 		for (;;) {
 			__asm__ volatile("hlt");
 		}
+	}
+
+	if (r->vector == 0x20) {
+		timer_irq_handler();
 	}
 
 	if (r->vector == 0x21) {
