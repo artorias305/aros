@@ -4,6 +4,7 @@
 #include "idt.h"
 #include "keyboard.h"
 #include "serial.h"
+#include "shell.h"
 #include "vga.h"
 
 #define MB_ALIGN (1u << 0)
@@ -48,7 +49,5 @@ void kernel_main(void) {
 
 	__asm__ volatile("sti");
 
-	for (;;) {
-		__asm__ volatile("hlt");
-	}
+	shell_run();
 }
