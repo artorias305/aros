@@ -1,5 +1,7 @@
 #include "keyboard.h"
 
+#include <stddef.h>
+
 #include "io.h"
 #include "serial.h"
 #include "vga.h"
@@ -7,6 +9,8 @@
 #define PS2_DATA 0x60u
 #define PS2_STATUS 0x64u
 #define PS2_CMD 0x64u
+
+#define KEYBUF_SIZE 256
 
 static const char keymap[128] = {
 	0,	 27,  '1',	'2',  '3',	'4', '5', '6',	'7', '8', '9', '0',
@@ -25,6 +29,28 @@ static const char shiftmap[128] = {
 };
 
 static int shift = 0;
+
+static volatile char keybuf[KEYBUF_SIZE];
+static volatile size_t key_head = 0;
+static volatile size_t key_tail = 0;
+
+static void keybuf_push(char c) {
+	size_t next = (key_head + 1) % KEYBUF_SIZE;
+	if (next == key_tail) {
+		return;
+	}
+	keybuf[key_head] = c;
+	key_head = next;
+}
+
+int keyboard_read_char(void) {
+	if (key_head == key_tail) {
+		return -1;
+	}
+	char c = keybuf[key_tail];
+	key_tail = (key_tail + 1) % KEYBUF_SIZE;
+	return c;
+}
 
 void keyboard_init(void) {
 	while ((inb(PS2_STATUS) & 1u) != 0u) {
@@ -55,9 +81,5 @@ void keyboard_irq_handler(void) {
 		return;
 	}
 
-	if (c == '\n') {
-		serial_write_byte('\r');
-	}
-	vga_write_char(c);
-	serial_write_byte(c);
+	keybuf_push(c);
 }
