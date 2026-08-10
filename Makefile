@@ -6,14 +6,14 @@ CFLAGS  := --target=$(TARGET) -std=c11 -ffreestanding -fno-builtin \
            -O2 -g -Wall -Wextra
 LDFLAGS := -m elf_i386 -T src/linker.ld -nostdlib
 
-OBJS := build/main.o build/serial.o
+OBJS := build/main.o build/serial.o build/vga.o
 
 all: build/kernel.elf
 
 build/kernel.elf: $(OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
-build/%.o: src/%.c src/serial.h | build
+build/%.o: src/%.c | build
 	$(CC) $(CFLAGS) -c $< -o $@
 
 build:
