@@ -7,6 +7,7 @@
 #include "io.h"
 #include "keyboard.h"
 #include "kprintf.h"
+#include "pmm.h"
 #include "serial.h"
 #include "timer.h"
 #include "vga.h"
@@ -24,8 +25,9 @@ static void cmd_help(const char *arg) {
 	kprintf("  echo <txt>  print text\n");
 	kprintf("  clear       clear screen\n");
 	kprintf("  reboot      reset the machine\n");
-	kprintf("  uptime     kernel uptime\n");
-	kprintf("  sleep <s>  pause for s seconds\n");
+	kprintf("  uptime      kernel uptime\n");
+	kprintf("  sleep <s>   pause for s seconds\n");
+	kprintf("  meminfo     memory usage\n");
 }
 
 static void cmd_about(const char *arg) {
@@ -38,7 +40,9 @@ static void cmd_clear(const char *arg) {
 	vga_clear();
 }
 
-static void cmd_echo(const char *arg) { kprintf("%s\n", arg); }
+static void cmd_echo(const char *arg) {
+	kprintf("%s\n", arg);
+}
 
 static void cmd_reboot(const char *arg) {
 	(void)arg;
@@ -69,6 +73,12 @@ static void cmd_sleep(const char *arg) {
 	sleep_ticks((uint32_t)secs * 100);
 }
 
+static void cmd_meminfo(const char *arg) {
+	(void)arg;
+	kprintf("phys: %u KB usable, %u KB free (4 KB pages)\n",
+			pmm_total_frames() * 4u, pmm_free_frames() * 4u);
+}
+
 struct command {
 	const char *name;
 	void (*func)(const char *arg);
@@ -77,7 +87,7 @@ struct command {
 static const struct command commands[] = {
 	{"help", cmd_help},	  {"about", cmd_about},	  {"clear", cmd_clear},
 	{"echo", cmd_echo},	  {"reboot", cmd_reboot}, {"echo", cmd_echo},
-	{"sleep", cmd_sleep}, {"uptime", cmd_uptime}};
+	{"sleep", cmd_sleep}, {"uptime", cmd_uptime}, {"meminfo", cmd_meminfo}};
 
 static int str_eq(const char *a, const char *b) {
 	while (*a != '\0' && *b != '\0') {
