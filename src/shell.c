@@ -116,9 +116,9 @@ struct command {
 };
 
 static const struct command commands[] = {
-	{"help", cmd_help},	  {"about", cmd_about},	  {"clear", cmd_clear},
-	{"echo", cmd_echo},	  {"reboot", cmd_reboot}, {"echo", cmd_echo},
-	{"sleep", cmd_sleep}, {"uptime", cmd_uptime}, {"meminfo", cmd_meminfo},
+	{"help", cmd_help},		 {"about", cmd_about},	 {"clear", cmd_clear},
+	{"echo", cmd_echo},		 {"reboot", cmd_reboot}, {"echo", cmd_echo},
+	{"sleep", cmd_sleep},	 {"uptime", cmd_uptime}, {"meminfo", cmd_meminfo},
 	{"memtest", cmd_memtest}};
 
 static int str_eq(const char *a, const char *b) {
