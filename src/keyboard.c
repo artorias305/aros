@@ -3,8 +3,6 @@
 #include <stddef.h>
 
 #include "io.h"
-#include "serial.h"
-#include "vga.h"
 
 #define PS2_DATA 0x60u
 #define PS2_STATUS 0x64u
