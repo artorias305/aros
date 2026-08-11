@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "heap.h"
 #include "io.h"
 #include "keyboard.h"
 #include "kprintf.h"
@@ -28,6 +29,7 @@ static void cmd_help(const char *arg) {
 	kprintf("  uptime      kernel uptime\n");
 	kprintf("  sleep <s>   pause for s seconds\n");
 	kprintf("  meminfo     memory usage\n");
+	kprintf("  memtest     heap alloc test\n");
 }
 
 static void cmd_about(const char *arg) {
@@ -40,9 +42,7 @@ static void cmd_clear(const char *arg) {
 	vga_clear();
 }
 
-static void cmd_echo(const char *arg) {
-	kprintf("%s\n", arg);
-}
+static void cmd_echo(const char *arg) { kprintf("%s\n", arg); }
 
 static void cmd_reboot(const char *arg) {
 	(void)arg;
@@ -77,6 +77,37 @@ static void cmd_meminfo(const char *arg) {
 	(void)arg;
 	kprintf("phys: %u KB usable, %u KB free (4 KB pages)\n",
 			pmm_total_frames() * 4u, pmm_free_frames() * 4u);
+	kprintf("heap: %u KB mapped, %u KB used\n", heap_size() / 1024u,
+			heap_used() / 1024u);
+}
+
+static void cmd_memtest(const char *arg) {
+	(void)arg;
+	const size_t sizes[] = {16u, 64u, 257u, 1024u, 4096u, 3u};
+	const unsigned n = (unsigned)(sizeof(sizes) / sizeof(sizes[0]));
+	char *bufs[6];
+	for (unsigned i = 0; i < n; i++) {
+		bufs[i] = kmalloc(sizes[i]);
+		if (bufs[i] == NULL) {
+			kprintf("memtest: alloc %u failed\n", (unsigned)sizes[i]);
+			return;
+		}
+		for (size_t j = 0; j < sizes[i]; j++) {
+			bufs[i][j] = (char)(i + j);
+		}
+	}
+	for (unsigned i = 0; i < n; i++) {
+		for (size_t j = 0; j < sizes[i]; j++) {
+			if (bufs[i][j] != (char)(i + j)) {
+				kprintf("memtest: byte mismatch at %u,%zu\n", (unsigned)i, j);
+				return;
+			}
+		}
+	}
+	for (unsigned i = 0; i < n; i++) {
+		kfree(bufs[i]);
+	}
+	kprintf("memtest: %u allocs ok, heap %u B used\n", n, heap_used());
 }
 
 struct command {
@@ -87,7 +118,8 @@ struct command {
 static const struct command commands[] = {
 	{"help", cmd_help},	  {"about", cmd_about},	  {"clear", cmd_clear},
 	{"echo", cmd_echo},	  {"reboot", cmd_reboot}, {"echo", cmd_echo},
-	{"sleep", cmd_sleep}, {"uptime", cmd_uptime}, {"meminfo", cmd_meminfo}};
+	{"sleep", cmd_sleep}, {"uptime", cmd_uptime}, {"meminfo", cmd_meminfo},
+	{"memtest", cmd_memtest}};
 
 static int str_eq(const char *a, const char *b) {
 	while (*a != '\0' && *b != '\0') {
