@@ -3,6 +3,7 @@ ENTRY(_start)
 SECTIONS
 {
     . = 1M; /* Load address */
+    _kernel_start = .;
 
     .text ALIGN(4096) :
     {
@@ -28,4 +29,6 @@ SECTIONS
         *(COMMON)
         *(.bss)
     }
+
+    _kernel_end = .;
 }

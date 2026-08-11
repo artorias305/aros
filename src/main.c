@@ -3,6 +3,9 @@
 #include "gdt.h"
 #include "idt.h"
 #include "keyboard.h"
+#include "multiboot.h"
+#include "paging.h"
+#include "pmm.h"
 #include "serial.h"
 #include "shell.h"
 #include "timer.h"
@@ -27,13 +30,14 @@ static uint8_t stack[16384] __attribute__((aligned(16), section(".bss")));
 
 __attribute__((naked, noreturn)) void _start(void) {
 	__asm__ volatile("movl %0, %%esp\n\t"
+					 "pushl %%ebx\n\t"
 					 "call kernel_main\n\t"
 					 :
-					 : "r"(stack + sizeof(stack))
+					 : "i"(stack + sizeof(stack))
 					 : "memory");
 }
 
-void kernel_main(void) {
+void kernel_main(struct multiboot_info *mbi) {
 	serial_init();
 	serial_print("[BOOT] serial initialized\n");
 
@@ -44,6 +48,12 @@ void kernel_main(void) {
 
 	idt_init();
 	serial_print("[OK]  IDT loaded\n");
+
+	pmm_init(mbi);
+	serial_print("[OK]  PMM initialized\n");
+
+	paging_init();
+	serial_print("[OK]  paging enabled\n");
 
 	keyboard_init();
 	serial_print("[OK]  keyboard initialized\n");

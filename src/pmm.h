@@ -1,0 +1,15 @@
+#ifndef PMM_H
+#define PMM_H
+
+#include <stdint.h>
+
+#include "multiboot.h"
+
+void pmm_init(const struct multiboot_info *mbi);
+uint32_t pmm_alloc_frame(void);
+void pmm_free_frame(uint32_t addr);
+uint32_t pmm_total_frames(void);
+uint32_t pmm_free_frames(void);
+uint32_t pmm_top_addr(void);
+
+#endif
