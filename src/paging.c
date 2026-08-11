@@ -56,3 +56,31 @@ void paging_init(void) {
 					 : "r"(page_directory)
 					 : "eax", "memory");
 }
+
+void paging_map_page(uint32_t virt, uint32_t phys) {
+	uint32_t pd_idx = virt >> 22;
+	uint32_t pt_idx = (virt >> 12) & (PAGE_TABLE_ENTRIES - 1u);
+
+	uint32_t pt_addr;
+	if ((page_directory[pd_idx] & PTE_PRESENT) == 0u) {
+		pt_addr = pmm_alloc_frame();
+		if (pt_addr == 0u) {
+			serial_print("[PANIC] no frame for page table\n");
+			for (;;) {
+				__asm__ volatile("hlt");
+			}
+		}
+		uint32_t *pt = (uint32_t *)pt_addr;
+		for (uint32_t j = 0; j < PAGE_TABLE_ENTRIES; j++) {
+			pt[j] = 0u;
+		}
+		page_directory[pd_idx] = pt_addr | PTE_PRESENT | PTE_WRITABLE;
+	} else {
+		pt_addr = page_directory[pd_idx] & 0xFFFFF000u;
+	}
+
+	uint32_t *pt = (uint32_t *)pt_addr;
+	pt[pt_idx] = (phys & 0xFFFFF000u) | PTE_PRESENT | PTE_WRITABLE;
+
+	__asm__ volatile("invlpg %0" : : "m"(*(uint32_t *)virt) : "memory");
+}
