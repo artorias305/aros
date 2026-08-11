@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "gdt.h"
+#include "heap.h"
 #include "idt.h"
 #include "keyboard.h"
 #include "multiboot.h"
@@ -54,6 +55,9 @@ void kernel_main(struct multiboot_info *mbi) {
 
 	paging_init();
 	serial_print("[OK]  paging enabled\n");
+
+	heap_init();
+	serial_print("[OK]  heap initialized\n");
 
 	keyboard_init();
 	serial_print("[OK]  keyboard initialized\n");
