@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#include "acpi.h"
 #include "gdt.h"
 #include "heap.h"
 #include "idt.h"
@@ -55,6 +56,12 @@ void kernel_main(struct multiboot_info *mbi) {
 
 	paging_init();
 	serial_print("[OK]  paging enabled\n");
+
+	if (acpi_init()) {
+		serial_print("[OK]  ACPI ready\n");
+	} else {
+		serial_print("[WARN] ACPI tables not found\n");
+	}
 
 	heap_init();
 	serial_print("[OK]  heap initialized\n");
