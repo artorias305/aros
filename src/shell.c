@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "acpi.h"
 #include "heap.h"
 #include "io.h"
 #include "keyboard.h"
@@ -26,6 +27,7 @@ static void cmd_help(const char *arg) {
 	kprintf("  echo <txt>  print text\n");
 	kprintf("  clear       clear screen\n");
 	kprintf("  reboot      reset the machine\n");
+	kprintf("  poweroff    ACPI shutdown\n");
 	kprintf("  uptime      kernel uptime\n");
 	kprintf("  sleep <s>   pause for s seconds\n");
 	kprintf("  meminfo     memory usage\n");
@@ -50,6 +52,13 @@ static void cmd_reboot(const char *arg) {
 	outb(0x64, 0xFE);
 	for (;;) {
 		__asm__ volatile("hlt");
+	}
+}
+
+static void cmd_poweroff(const char *arg) {
+	(void)arg;
+	if (acpi_poweroff() < 0) {
+		kprintf("poweroff: ACPI not available\n");
 	}
 }
 
@@ -117,7 +126,7 @@ struct command {
 
 static const struct command commands[] = {
 	{"help", cmd_help},		 {"about", cmd_about},	 {"clear", cmd_clear},
-	{"echo", cmd_echo},		 {"reboot", cmd_reboot}, {"echo", cmd_echo},
+	{"echo", cmd_echo},		 {"reboot", cmd_reboot}, {"poweroff", cmd_poweroff},
 	{"sleep", cmd_sleep},	 {"uptime", cmd_uptime}, {"meminfo", cmd_meminfo},
 	{"memtest", cmd_memtest}};
 
