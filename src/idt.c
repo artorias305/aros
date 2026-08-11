@@ -51,11 +51,16 @@ __attribute__((naked, used)) static void isr_common(void) {
 			"call isr_handler\n\t"
 			"addl $4, %esp\n\t"
 			"popa\n\t"
-			"addl $4, %esp\n\t"
+			"addl $8, %esp\n\t"
 			"iret");
 }
 
 #define ISR_STUB(n)                                                            \
+	__attribute__((naked)) static void isr_##n(void) {                         \
+		__asm__("pushl $0\n\tpushl $" #n "\n\tjmp isr_common");                \
+	}
+
+#define ISR_STUB_ERR(n)                                                        \
 	__attribute__((naked)) static void isr_##n(void) {                         \
 		__asm__("pushl $" #n "\n\tjmp isr_common");                            \
 	}
@@ -68,27 +73,33 @@ ISR_STUB(4)
 ISR_STUB(5)
 ISR_STUB(6)
 ISR_STUB(7)
-ISR_STUB(8)
+ISR_STUB_ERR(8)
 ISR_STUB(9)
-ISR_STUB(10)
-ISR_STUB(11)
-ISR_STUB(12)
-ISR_STUB(13)
-ISR_STUB(14)
+ISR_STUB_ERR(10)
+ISR_STUB_ERR(11)
+ISR_STUB_ERR(12)
+ISR_STUB_ERR(13)
+ISR_STUB_ERR(14)
 ISR_STUB(15)
 ISR_STUB(16)
 ISR_STUB(17)
 ISR_STUB(18)
 ISR_STUB(19)
-ISR_STUB(20) ISR_STUB(21) ISR_STUB(22) ISR_STUB(23) ISR_STUB(24) ISR_STUB(25)
-	ISR_STUB(26) ISR_STUB(27) ISR_STUB(28) ISR_STUB(29) ISR_STUB(30)
-		ISR_STUB(31) ISR_STUB(32) ISR_STUB(33)
+ISR_STUB(20)
+ISR_STUB(21)
+ISR_STUB(22)
+ISR_STUB(23)
+ISR_STUB(24)
+ISR_STUB(25)
+ISR_STUB(26)
+ISR_STUB(27)
+ISR_STUB(28) ISR_STUB(29) ISR_STUB(30) ISR_STUB(31) ISR_STUB(32) ISR_STUB(33)
 
-			static void (*const isr_table[32])(void) = {
-				isr_0,	isr_1,	isr_2,	isr_3,	isr_4,	isr_5,	isr_6,	isr_7,
-				isr_8,	isr_9,	isr_10, isr_11, isr_12, isr_13, isr_14, isr_15,
-				isr_16, isr_17, isr_18, isr_19, isr_20, isr_21, isr_22, isr_23,
-				isr_24, isr_25, isr_26, isr_27, isr_28, isr_29, isr_30, isr_31,
+	static void (*const isr_table[32])(void) = {
+		isr_0,	isr_1,	isr_2,	isr_3,	isr_4,	isr_5,	isr_6,	isr_7,
+		isr_8,	isr_9,	isr_10, isr_11, isr_12, isr_13, isr_14, isr_15,
+		isr_16, isr_17, isr_18, isr_19, isr_20, isr_21, isr_22, isr_23,
+		isr_24, isr_25, isr_26, isr_27, isr_28, isr_29, isr_30, isr_31,
 };
 
 static const char *const exception_names[32] = {
