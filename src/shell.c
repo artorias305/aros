@@ -40,9 +40,7 @@ static void cmd_clear(const char *arg) {
 	vga_clear();
 }
 
-static void cmd_echo(const char *arg) {
-	kprintf("%s\n", arg);
-}
+static void cmd_echo(const char *arg) { kprintf("%s\n", arg); }
 
 static void cmd_reboot(const char *arg) {
 	(void)arg;
