@@ -158,6 +158,12 @@ void isr_handler(struct regs *r) {
 		serial_write_hex(r->vector);
 		serial_print(") at eip=");
 		serial_write_hex(r->eip);
+		if (r->vector == 14) {
+			uint32_t cr2;
+			__asm__ volatile("mov %%cr2, %0" : "=r"(cr2));
+			serial_print("  fault addr=");
+			serial_write_hex(cr2);
+		}
 		serial_print("\n");
 		for (;;) {
 			__asm__ volatile("hlt");
