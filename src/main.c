@@ -30,22 +30,25 @@ __attribute__((section(".multiboot"), used, aligned(4))) static const struct {
 
 static uint8_t stack[16384] __attribute__((aligned(16), section(".bss")));
 
-__attribute__((naked, noreturn)) void _start(void) {
+__attribute__((naked, noreturn)) void _start(void)
+{
 	__asm__ volatile("movl %0, %%esp\n\t"
-					 "pushl %%ebx\n\t"
-					 "call kernel_main\n\t"
-					 :
-					 : "i"(stack + sizeof(stack))
-					 : "memory");
+			 "pushl %%ebx\n\t"
+			 "call kernel_main\n\t"
+			 :
+			 : "i"(stack + sizeof(stack))
+			 : "memory");
 }
 
-void kernel_main(struct multiboot_info *mbi) {
+void kernel_main(struct multiboot_info *mbi)
+{
 	serial_init();
 	serial_print("[BOOT] serial initialized\n");
 
 	vga_init();
 
 	gdt_init();
+	tss_set_esp0((uint32_t)(uintptr_t)(stack + sizeof(stack)));
 	serial_print("[OK]  GDT loaded\n");
 
 	idt_init();
