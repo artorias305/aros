@@ -5,8 +5,8 @@
 #include "keyboard.h"
 #include "serial.h"
 #include "timer.h"
+#include "gdt.h"
 
-#define KERNEL_CS 0x08u
 #define IDT_INT32 0x8Eu
 
 #define PIC1_COMMAND 0x20u

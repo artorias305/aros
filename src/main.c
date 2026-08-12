@@ -46,6 +46,7 @@ void kernel_main(struct multiboot_info *mbi) {
 	vga_init();
 
 	gdt_init();
+	tss_set_esp0((uint32_t)(uintptr_t)(stack + sizeof(stack)));
 	serial_print("[OK]  GDT loaded\n");
 
 	idt_init();
